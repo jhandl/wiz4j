@@ -16,7 +16,7 @@ limitations under the License.
 
 <project name="wiz4j" default="jar" basedir=".">
     <property name="project" value="wiz4j"/>
-    <property name="version" value="trunk"/>
+    <property name="version" value="1.0"/>
 
     <property name="src.dir" value="${basedir}/src"/>
     <property name="test.dir" value="${basedir}/test"/>
@@ -25,6 +25,7 @@ limitations under the License.
     <property name="conf.dir" value="${basedir}/conf"/>
     
     <property name="dist.dir" value="${basedir}/dist" />
+    <property name="tools.dir" value="${basedir}/tools" />
 	<property name="doc.dir" value="${basedir}/docs" />
 	<property name="javadoc.dir" value="${doc.dir}/javadoc"/>
     <property name="output.dir"  location="${basedir}/output"/>
@@ -104,33 +105,45 @@ limitations under the License.
             <fileset dir="${build.dir}" excludes="**/*Test.class">
                 <include name="com/flaptor/**/*.class"/>
             </fileset>
-            <fileset dir="${conf.dir}" >
+            <!-- fileset dir="${conf.dir}" >
                 <include name="*.properties.defaults"/>
-            </fileset>
+            </fileset-->
         </jar>
     </target>
 
     <!--******************************************************************************************************-->
     <target name="dist" depends="clean, jar, doc">
         <mkdir dir="${dist.dir}"/>
-        <copy todir="${tmp.bin.dir}">
-            <fileset dir="${bin.dir}"/>
-        </copy>
-        <copy todir="${tmp.conf.dir}">
-            <fileset dir="${conf.dir}">
-                <include name="*.properties"/>
-            </fileset>
-        </copy>
         <tar destfile="${dist.dir}/${project}-${version}.tgz" compression="gzip">
+            <tarfileset file="${doc.dir}/LICENSE"/>
             <tarfileset dir="${doc.dir}" prefix="doc"/>
             <tarfileset dir="${lib.dir}" prefix="lib"/>
-            <tarfileset dir="${output.dir}" prefix="bin">
+            <tarfileset dir="${output.dir}">
                 <include name="${project}-${version}.jar" />
             </tarfileset>
-            <tarfileset dir="${tmp.conf.dir}" prefix="bin/conf" />
         </tar>
     </target>
 
+	<target name="distsrc" depends="clean, jar, doc">
+        <mkdir dir="${dist.dir}"/>
+        <tar destfile="${dist.dir}/${project}-${version}-src.tgz" compression="gzip">
+            <tarfileset file="${doc.dir}/LICENSE"/>
+            <tarfileset dir="${doc.dir}" prefix="doc"/>
+            <tarfileset dir="${lib.dir}" prefix="lib"/>
+            <tarfileset dir="${output.dir}">
+                <include name="${project}-${version}.jar" />
+            </tarfileset>
+
+           	<tarfileset file="build.xml"/>
+            <tarfileset dir="${src.dir}" prefix="src"/>
+            <tarfileset dir="${test.dir}" prefix="test"/>
+            <tarfileset dir="${tools.dir}" prefix="tools"/>
+        	<tarfileset dir="${conf.dir}" prefix="conf"/>
+        </tar>
+    </target>
+
+	
+	
     <!--******************************************************************************************************-->
     <target name="doc" description="creates the wiz4j javadoc" >
         <delete dir="${javadoc.dir}" />
@@ -151,9 +164,6 @@ limitations under the License.
               <path refid="classpath.jars.tools" />
               <path refid="classpath.jars.util" />
             </classpath>
-            <link href="http://lucene.zones.apache.org:8080/hudson/job/Lucene-Nightly/javadoc/" />
-            <link href="http://s1/javadocs/log4j/1.2.11/" />
-            <link href="http://junit.sourceforge.net/javadoc/" />
             <taglet name="ToDo" path="tools/taglets.jar" />
             <taglet name="FixMe" path="tools/taglets.jar" />
         </javadoc>
