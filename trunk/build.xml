@@ -124,8 +124,7 @@ limitations under the License.
         </tar>
     </target>
 
-	<target name="distsrc" depends="clean, jar, doc">
-        <mkdir dir="${dist.dir}"/>
+	<target name="distsrc" depends="dist">
         <tar destfile="${dist.dir}/${project}-${version}-src.tgz" compression="gzip">
             <tarfileset file="${doc.dir}/LICENSE"/>
             <tarfileset dir="${doc.dir}" prefix="doc"/>
