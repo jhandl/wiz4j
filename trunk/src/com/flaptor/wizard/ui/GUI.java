@@ -15,6 +15,7 @@ limitations under the License.
 */
 package com.flaptor.wizard.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -29,6 +30,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
@@ -60,7 +62,7 @@ public class GUI extends AbstractUI{
     private JButton nextFinishButton;
 
     private Box textPanelBox = new Box(BoxLayout.Y_AXIS);
-    private Box buttonBox = new Box(BoxLayout.X_AXIS);
+    private JPanel buttonBox = new JPanel();
     private Page page;
     
     public GUI(String title) {
@@ -73,8 +75,9 @@ public class GUI extends AbstractUI{
         frame.setLocation((screenSize.width - minimumSize.width)/2, (screenSize.height - minimumSize.height)/ 2 );
         frame.setMinimumSize(minimumSize);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(textPanelBox, java.awt.BorderLayout.NORTH);
-        frame.getContentPane().add(buttonBox, java.awt.BorderLayout.SOUTH);
+        frame.getContentPane().add(textPanelBox, BorderLayout.NORTH);
+        frame.getContentPane().add(buttonBox, BorderLayout.SOUTH);
+        buttonBox.setLayout(new BorderLayout());
     }
        
     public Action doPageInternal(Page page, boolean withBack) {
@@ -207,38 +210,38 @@ public class GUI extends AbstractUI{
      */
     private void addButtons(Page page, boolean withBack) {
     	buttonBox.removeAll();
+    	Box backNextBox = new Box(BoxLayout.X_AXIS);
     	
-    	if (!page.isAutomaticAdvance()) {
-            if (page.isLast()) {
-                nextFinishButton = new JButton("finish");
-                nextFinishButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {action = Action.finish;}
-                });
-                buttonBox.add(nextFinishButton);
-            } else {
-                nextFinishButton = new JButton("next");
-                nextFinishButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {action = Action.next;}
-                });
-                buttonBox.add(nextFinishButton);
-            }
-        }
-        buttonBox.add(new JLabel("   "));
-        if (withBack && page.isCanCancelOrBack()) {
-            JButton button = new JButton("back");
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {action = Action.back;}
-            });
-            buttonBox.add(button);
-            buttonBox.add(new JLabel("   "));
-        }
         if (page.isCanCancelOrBack()) {
             JButton button = new JButton("cancel");
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {action = Action.cancel;}
             });
-            buttonBox.add(button);
+            buttonBox.add(button,BorderLayout.WEST);
         }
+        if (withBack && page.isCanCancelOrBack()) {
+            JButton button = new JButton("< back");
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {action = Action.back;}
+            });
+            backNextBox.add(button);
+            backNextBox.add(new JLabel(" "));
+        }
+        if (!page.isAutomaticAdvance()) {
+            if (page.isLast()) {
+                nextFinishButton = new JButton("finish!");
+                nextFinishButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {action = Action.finish;}
+                });
+            } else {
+                nextFinishButton = new JButton("next >");
+                nextFinishButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {action = Action.next;}
+                });
+            }
+            backNextBox.add(nextFinishButton);
+        }
+        buttonBox.add(backNextBox, BorderLayout.EAST);
     }
         
     private static class SetValueActionListener implements ActionListener {
