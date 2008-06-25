@@ -55,11 +55,15 @@ public class Page {
     }
 
     public void clearElements() {
-    	elements.clear();
+        synchronized (elements) {
+            elements.clear();            
+        }
     }
     
     public Page add(PageElement e) {
-        elements.add(e);
+        synchronized (elements) {
+            elements.add(e);            
+        }
         return this;
     }
     
@@ -85,13 +89,15 @@ public class Page {
      * @return the input page element that holds the propertyname
      */
     public InputPageElement getElementForProperty(String propertyName) {
-        for (PageElement element : elements) {
-            if (element instanceof InputPageElement) {
-                InputPageElement input = (InputPageElement) element;
-                if (input.getPropertyName().equals(propertyName)) return input;
+        synchronized (elements) {
+            for (PageElement element : elements) {
+                if (element instanceof InputPageElement) {
+                    InputPageElement input = (InputPageElement) element;
+                    if (input.getPropertyName().equals(propertyName)) return input;
+                }
             }
+            return null;
         }
-        return null;
     }
 
     /**

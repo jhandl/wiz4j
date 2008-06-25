@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -131,9 +132,12 @@ public class GUI extends AbstractUI{
      */
     private void renderElements(Page page) {
         textPanelBox.removeAll();
-        textPanelBox.add(new JLabel(" "));        
-        for (PageElement element : page.getElements()) {
-            render(element);
+        textPanelBox.add(new JLabel(" "));
+        List<PageElement> elements = page.getElements();
+        synchronized (elements) {
+            for (PageElement element : elements) {
+                render(element);
+            }
         }
         frame.pack();
         frame.getContentPane().repaint();
