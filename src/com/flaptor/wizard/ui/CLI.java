@@ -18,6 +18,7 @@ package com.flaptor.wizard.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import com.flaptor.wizard.Action;
 import com.flaptor.wizard.InputPageElement;
@@ -38,8 +39,11 @@ public class CLI extends AbstractUI {
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     
     public Action doPageInternal(Page page, boolean withBack) {
-        for (PageElement element : page.getElements()) {
-            render(element);
+        List<PageElement> elements = page.getElements();
+        synchronized (elements) {
+            for (PageElement element : elements) {
+                render(element);
+            }
         }
         System.out.println();
         while (!page.isReadyToAdvance()) {
